@@ -1,23 +1,27 @@
-angular.module('demo', [
+angular.module( 'trelloUtilities.projects', [
+  'ui.router',
   'ng',
   'trello-api-client',
   'satellizer'
 ])
 
-.config(function(TrelloClientProvider){
-  TrelloClientProvider.init({
-    key: '5443c286e5a91dca5a9b6541eb0c71f2',
-    appName: 'Trello Utilities App',
-    tokenExpiration: 'never',
-    scope: ['read', 'write', 'account'],
+.config(function config( $stateProvider ) {
+  $stateProvider.state( 'projects', {
+    url: '/projects',
+    views: {
+      "main": {
+        controller: 'ProjectsCtrl',
+        templateUrl: 'app/projects/projects.tpl.html'
+      }
+    },
+    data:{ pageTitle: 'Projects' }
   });
 })
 
-.controller('demoCtrl', function($scope, TrelloClient){
+.controller( 'ProjectsCtrl', function ProjectsCtrl( $rootScope, $scope, TrelloClient){
   $scope.popupOptions = {
     type: 'popup'
   }
-  $scope.authenticate = TrelloClient.authenticate
 
   $scope.organizations = {};
   $scope.searching = false;
@@ -132,7 +136,9 @@ angular.module('demo', [
   }
 
   $scope.getBoards = function(){
-    console.log($scope.member);
+    if($scope.searching)
+      return;
+    
     $scope.searching = true;
     async.each($scope.member.idOrganizations, function (id, callback) {
         $scope.organizations[id] = {
@@ -173,20 +179,16 @@ angular.module('demo', [
 
   }
 
-  
   $scope.setCurrentBoard = function(board) {
     console.log(board);
     $scope.currentBoard = board;
   }
 
-  $scope.init = function(){
-    TrelloClient.get('/members/me').then(function(result){
-      $scope.member = result.data;
-      console.log($scope.member);
-    }).catch(function(error){
-      console.log(error);
-      $scope.authenticate();
-    });
-  };
+  $rootScope.$on("memberLoaded", function (args) {
+    console.log("memberLoaded");
+    $scope.getBoards();
+  });
   $scope.init();
-});
+})
+
+;
