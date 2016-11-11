@@ -12,16 +12,13 @@
                 <td>
                     Tarjetas sin padre
                 </td>
-                <td>
-                    Cards
-                </td>
+                
             </tr>
         </thead>
         <tbody>
           <tr ng-repeat="board in organization.boards" ng-show="!board.closed">
             <td><a href="{{ board.url }}" target="_blank">{{ board.name }}</a></td>
             <td><a href="#myModal" data-toggle="modal" data-target="#myModal" ng-click="setCurrentBoard(board)"v >{{ board.cardsMissingParent.length }}</a></td>
-            <td>Lugar extra</td>
           </tr>
         </tbody>
   </table>

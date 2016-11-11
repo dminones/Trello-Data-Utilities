@@ -1,13 +1,110 @@
+
 angular.module( 'trelloUtilities.trelloModel', [
   'trello-api-client',
   'satellizer'
 ])
 
-.factory('TrelloModel', [ 'TrelloClient', 
-	function(TrelloClient){
+.factory('TrelloFactory', [ 
+	function(){
+		function List (list)  {
+			return list;
+		}
+
+		function Card (card)  {
+			return card;
+		}
+
+		function Board (board){
+			board.setLists = function(lists) {
+				board.lists = {};
+	            lists.forEach(function(list){
+		            board.lists[list.id] = List(list);
+		            if(list.name == "Lista Comercial") {
+		            	board.listaComercialId = list.id;
+		            	board.listaComercial = list;
+		            }
+		            if(list.name == "Lista Comercial Done") {
+		            	board.listaComercialDoneId = list.id;
+		            	board.listaComercialDone = list;
+		            }
+		        });
+			}
+
+			board.setChecklists = function(checklists) {
+				board.checklists = {};
+          		checklists.forEach(function(checklist){
+            		board.checklists[checklist.id] = checklist;
+          		});
+			}
+
+			board.setCards = function(cards) {
+				board._cardsUrlsWithParent = [];
+				board.cards = [];
+                cards.forEach(function(card){
+                  board.cards.push(card);
+                  card.idChecklists.forEach(function(id){
+                    var checklist = board.checklists[id];
+                    if(checklist.name == "Children"){
+                      console.log(card.name, " tiene hijos");
+                      checklist.checkItems.forEach(function(hijo){
+                        board._cardsUrlsWithParent.push(hijo.name);
+                      });
+                    }
+                  });
+                });
+			}
+
+			board.boardLoaded = function() {
+				board.cardsMissingParent = [];
+	            board.cards.forEach(function(card){
+		            if((board._cardsUrlsWithParent.indexOf(card.url) == -1) &&
+		            	card.idList != board.listaComercialId &&
+		                card.idList != board.listaComercialDoneId ){
+		                board.cardsMissingParent.push(card);
+		            }
+	           	});
+			}
+
+			return board;
+		}
+
+		function Organization (){
+			var profile = {};
+			var done = false;
+			var boards = [];
+		
+			function setBoards (theBoards) {
+				theBoards.forEach(function(board){
+					boards.push(Board(board));
+				});
+			}
+
+			return {
+		       	profile : profile,
+		        boards: boards,
+		        done: done,
+		        setBoards: setBoards
+			};
+		}
+
+		return {
+			newOrganization: Organization,
+			newBoard: Board,
+			newList: List,
+			newCard: Card
+		};
+	}
+])
+
+.factory('TrelloModel', [ 'TrelloClient', 'TrelloFactory',
+	function(TrelloClient, TrelloFactory){
 		var member = {};
 		var organizations = {};
 		var balance = {};
+
+		function setMember(aMember){
+			member = aMember;
+		}
 
 		function getBoards(callback) {
 		    async.each(member.idOrganizations, function (id, callback) {
@@ -16,16 +113,11 @@ angular.module( 'trelloUtilities.trelloModel', [
 		            TrelloClient.get('/organizations/'+id+'').then(function(result){
 		              console.log(result.data.displayName);
 		              if(result.data.displayName.indexOf("Projects") != -1) {
-		                organizations[id] = {
-		                  profile : {},
-		                  boards: [],
-		                  done: false
-		                };
-
-		                organizations[id].profile = result.data;
+		                organizations[id] = TrelloFactory.newOrganization();
+						organizations[id].profile = result.data;
 		                callback(null);
 		              } else {
-		                callback({ noProjectOrganization : true });
+		                callback({ message : "noProjectOrganization" });
 		              }
 		              
 		            }).catch(function(error){
@@ -34,17 +126,15 @@ angular.module( 'trelloUtilities.trelloModel', [
 		          },
 		          function(callback) {
 		              TrelloClient.get('/organizations/'+id+'/boards/all').then(function(result){
-		                organizations[id].boards = result.data;
+		                organizations[id].setBoards(result.data);
 		                callback(null);
 		              }).catch(function(error){
 		                callback(error);
 		              });
 		          }
 		      ], function (err, result) {
-		        console.log(err);
-		        if (err) {
-		          console.error(err.message);
-		        }
+		        if (err && (err.message != "noProjectOrganization") ) console.error(err.message);
+
 		        callback();
 		      });
 		      
@@ -53,10 +143,6 @@ angular.module( 'trelloUtilities.trelloModel', [
 
 		        callback();
 		    });
-		}
-		
-		function setMember(aMember){
-			member = aMember;
 		}
 
 		function getAllBoardsData(doneOrganization, callback) {
@@ -68,16 +154,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 			            function(callback){
 			              async.retry({ times: 20, interval: 5000 }, function(retryCallback,results){
 			                TrelloClient.get('/boards/'+board.id+'/lists').then(function(result){
-			                  board.lists = {};
-			                  result.data.forEach(function(list){
-			                    board.lists[list.id] = list;
-			                    if(list.name == "Lista Comercial") {
-			                      board.listaComercialId = list.id;
-			                    }
-			                    if(list.name == "Lista Comercial Done") {
-			                      board.listaComercialDoneId = list.id;
-			                    }
-			                  });
+			                  board.setLists(result.data);
 			                  retryCallback(null,result.data);
 			                }).catch(function(error){
 			                  retryCallback(error);
@@ -90,10 +167,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 			            function(callback){
 			              async.retry({ times: 20, interval: 5000 }, function(retryCallback,results){
 			                TrelloClient.get('/boards/'+board.id+'/checklists').then(function(result){
-			                  board.checklists = {};
-			                  result.data.forEach(function(checklist){
-			                    board.checklists[checklist.id] = checklist;
-			                  });
+			                  board.setChecklists(result.data);
 			                  retryCallback(null,result.data);
 			                }).catch(function(error){
 			                  retryCallback(error);
@@ -109,20 +183,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 			              async.retry( { times: 20, interval: 5000 },
 			                function(retryCallback,results){
 			                  TrelloClient.get('/boards/'+board.id+'/cards/open').then(function(result){
-			                    board.cards = result.data;
-			                    board.cardsUrlsWithParent = [];
-			                    result.data.forEach(function(card){
-			                      //board.cards[card.url] = card;
-			                      card.idChecklists.forEach(function(id){
-			                        var checklist = board.checklists[id];
-			                        if(checklist.name == "Children"){
-			                          console.log(card.name, " tiene hijos");
-			                          checklist.checkItems.forEach(function(hijo){
-			                            board.cardsUrlsWithParent.push(hijo.name);
-			                          });
-			                        }
-			                      });
-			                    });
+			                    board.setCards(result.data);
 			                    retryCallback(null,result.data);
 			                  }).catch(function(error){
 			                    retryCallback(error);
@@ -131,14 +192,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 			                    if(err) {
 			                      console.error(err);
 			                    } else {
-			                      board.cardsMissingParent = [];
-			                      board.cards.forEach(function(card){
-			                        if((board.cardsUrlsWithParent.indexOf(card.url) == -1) &&
-			                           card.idList != board.listaComercialId &&
-			                           card.idList != board.listaComercialDoneId ){
-			                          board.cardsMissingParent.push(card);
-			                        }
-			                      });
+			                      board.boardLoaded();
 			                    }
 			                    callback(err);
 			                }); 
@@ -162,8 +216,6 @@ angular.module( 'trelloUtilities.trelloModel', [
 			getAllBoardsData: getAllBoardsData,
 			organizations: organizations,
 			member: member
-			//getBalance: getBalance,
-			//removeBalance: removeBalance
 		};
 	}
 ])
