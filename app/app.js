@@ -25,7 +25,7 @@ angular.module('trelloUtilities', [
   $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
     console.log("entro aca");
     if ( angular.isDefined( toState.data.pageTitle ) ) {
-      $scope.pageTitle = toState.data.pageTitle + ' | ngBoilerplate' ;
+      $scope.pageTitle = toState.data.pageTitle ;
     }
   });  
 
