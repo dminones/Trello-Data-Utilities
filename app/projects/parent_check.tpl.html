@@ -7,18 +7,18 @@
         <thead>
             <tr>
                 <td>
-                    Project
+                    Board
                 </td>
                 <td>
-                    Board
+                    Tarjetas sin padre
                 </td>
                 
             </tr>
         </thead>
         <tbody>
           <tr ng-repeat="board in organization.boards" ng-show="!board.closed">
-            <td>{{ board.name }}</td>
-            <td><a href="{{ board.url }}" target="_blank">{{ board.url }}</a></td>
+            <td><a href="{{ board.url }}" target="_blank">{{ board.name }}</a></td>
+            <td><a href="#myModal" data-toggle="modal" data-target="#myModal" ng-click="setCurrentBoard(board)"v >{{ board.cardsMissingParent.length }}</a></td>
           </tr>
         </tbody>
   </table>

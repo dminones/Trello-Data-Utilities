@@ -59,6 +59,12 @@ angular.module( 'trelloUtilities.projects', [
     console.log("memberLoaded");
     $scope.getBoards();
   });
+
+  $scope.init = function() {
+    if($scope.member){
+      $scope.getBoards();
+    }
+  }
   $scope.init();
 })
 

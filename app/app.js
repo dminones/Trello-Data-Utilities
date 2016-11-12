@@ -2,6 +2,7 @@ angular.module('trelloUtilities', [
   'trelloUtilities.login',
   'trelloUtilities.projects', 
   'trelloUtilities.about',
+  'trelloUtilities.parentCheck',
   'ui.router',
   'ng',
   'trello-api-client',
