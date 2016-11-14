@@ -1,4 +1,4 @@
-<h2>Organizaciones</h2>
+<h2>{{ pageTitle }}</h2>
 <!--<a class="btn btn-default" ng-click="getBoards()" ng-disabled="searching" role="button">Get Boards</a>-->
 <div ng-repeat="organization in organizations">
     <h3>{{ organization.profile.displayName }}</h3>
@@ -18,7 +18,7 @@
         <tbody>
           <tr ng-repeat="board in organization.boards" ng-show="!board.closed">
             <td><a href="{{ board.url }}" target="_blank">{{ board.name }}</a></td>
-            <td><a href="#myModal" data-toggle="modal" data-target="#myModal" ng-click="setCurrentBoard(board)"v >{{ board.cardsMissingParent.length }}</a></td>
+            <td><a style="cursor: pointer;" data-toggle="modal" data-target="#myModal" ng-click="setCurrentBoard(board)"v >{{ board.cardsMissingParent.length }}</a></td>
           </tr>
         </tbody>
   </table>
