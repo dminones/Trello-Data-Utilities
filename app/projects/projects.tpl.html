@@ -17,7 +17,16 @@
                 </td>
                 <td>
                     Estimate
+                </td> 
+                <td>
+                    Comercial
+                </td>
+                <td>
+                    Comercial Done
                 </td>  
+                <td>
+                    Progress
+                </td>    
             </tr>
         </thead>
         <tbody>
@@ -26,6 +35,9 @@
             <td>{{ board.client }}</td>
             <td>{{ board.projectName }} <a href="{{ board.url }}" target="_blank"><i role="button" class="glyphicon glyphicon-link" ></i></a></td>
             <td>{{ board.points }}</td>
+            <td>{{ board.progress.toDo }}</td>
+            <td>{{ board.progress.done }}</td>
+            <td>{{ board.progress.index | percentage:2 }}</td>
           </tr>
         </tbody>
   </table>

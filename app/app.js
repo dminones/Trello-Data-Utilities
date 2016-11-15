@@ -9,6 +9,12 @@ angular.module('trelloUtilities', [
   'satellizer',
 ])
 
+.filter('percentage', ['$filter', function ($filter) {
+  return function (input, decimals) {
+    return $filter('number')(input * 100, decimals) + '%';
+  };
+}])
+
 .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
   $urlRouterProvider.otherwise( '/projects' );
 })
