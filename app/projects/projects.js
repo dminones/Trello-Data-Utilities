@@ -27,11 +27,9 @@ angular.module( 'trelloUtilities.projects', [
 
   var doneOrganization = function(organization) {
     organization.done = true;
-    console.log("done", organization);
   };
 
   var doneGettingData = function() {
-    console.log($scope.organizations);
     $scope.searching = false;
   };
 

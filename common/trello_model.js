@@ -11,10 +11,45 @@ angular.module( 'trelloUtilities.trelloModel', [
 		}
 
 		function Card (card)  {
+
+			var reg = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m;//parse regexp- accepts digits, decimals and '?', surrounded by ()
+    		//var regC = /((?:^|\s?))\[(\x3f|\d*\.?\d+)(\])\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
+
+			var parsed=card.name.match(reg);
+			card.points= parsed ? parsed[2] : null;
+
+			//card.points = points;
+			console.log(card.name, "  " , card.points);
 			return card;
 		}
 
 		function Board (board){
+
+			board.setProjectDetails = function() {
+				var regEstimate = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m;//parse regexp- accepts digits, decimals and '?', surrounded by ()
+	    		var regId = /((?:^|\s?))\[(\x3f|\d*\.?\d+)(\])\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
+    			var regClient = /((?:^|\s?))\{(\x3f|\w*\.?\w+)(\})\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
+
+
+				board.projectName = board.name;
+				var parsed = board.name.match(regEstimate);
+				if(parsed) {
+					board.points= parsed[2];
+					board.projectName = board.projectName.replace(parsed[0],"");
+				}
+				var parsedId = board.projectName.match(regId);
+				if(parsedId) {
+					board.projectId= parsedId[2];
+					board.projectName = board.projectName.replace(parsedId[0],"");
+				}
+				var parsedClient = board.projectName.match(regClient);
+				if(parsedClient) {
+					board.client= parsedClient[2];
+					board.projectName = board.projectName.replace(parsedClient[0],"");
+				}
+				return board;
+			}
+
 			board.setLists = function(lists) {
 				board.lists = {};
 	            lists.forEach(function(list){
@@ -41,7 +76,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 				board._cardsUrlsWithParent = [];
 				board.cards = [];
                 cards.forEach(function(card){
-                  board.cards.push(card);
+                  board.cards.push(Card(card));
                   card.idChecklists.forEach(function(id){
                     var checklist = board.checklists[id];
                     if(checklist.name == "Children"){
@@ -65,7 +100,8 @@ angular.module( 'trelloUtilities.trelloModel', [
 	           	});
 			}
 
-			return board;
+			
+    		return board.setProjectDetails();
 		}
 
 		function Organization (){

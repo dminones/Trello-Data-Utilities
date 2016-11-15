@@ -7,18 +7,25 @@
         <thead>
             <tr>
                 <td>
+                    Id
+                </td>
+                <td>
+                    Client
+                </td>
+                <td>
                     Project
                 </td>
                 <td>
-                    Board
-                </td>
-                
+                    Estimate
+                </td>  
             </tr>
         </thead>
         <tbody>
           <tr ng-repeat="board in organization.boards" ng-show="!board.closed">
-            <td>{{ board.name }}</td>
-            <td><a href="{{ board.url }}" target="_blank">{{ board.url }}</a></td>
+            <td>{{ board.projectId }}</td>
+            <td>{{ board.client }}</td>
+            <td>{{ board.projectName }} <a href="{{ board.url }}" target="_blank"><i role="button" class="glyphicon glyphicon-link" ></i></a></td>
+            <td>{{ board.points }}</td>
           </tr>
         </tbody>
   </table>
