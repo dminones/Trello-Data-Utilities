@@ -28,7 +28,6 @@ angular.module( 'trelloUtilities.parentCheck', [
   });
 
    var getAllBoardsData = function (){
-    console.log(TrelloModel.organizations);
     $scope.organizations = TrelloModel.organizations;
     TrelloModel.getAllBoardsData(doneOrganization,doneGettingData);
   }
@@ -38,27 +37,24 @@ angular.module( 'trelloUtilities.parentCheck', [
           return;
 
     $scope.searching = true;
-    TrelloModel.setMember($scope.member);
+    TrelloModel.setMember($rootScope.member);
     TrelloModel.getBoards(getAllBoardsData);
   }
 
   var doneOrganization = function(organization) {
     organization.done = true;
-    console.log("done", organization);
   };
 
   var doneGettingData = function() {
-    console.log($scope.organizations);
     $scope.searching = false;
   };
 
   $scope.setCurrentBoard = function(board) {
-    console.log("currentBoar",board);
     $scope.currentBoard = board;
   }
 
   $scope.init = function() {
-    if($scope.member){
+    if($rootScope.member){
       $scope.getBoards();
     }
   }

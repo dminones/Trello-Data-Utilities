@@ -41,11 +41,11 @@ angular.module( 'trelloUtilities.trelloModel', [
 
 			board.setProgress = function() {
 				board.progress = {};
-				board.progress.toDo = board.listaComercial.points;
-				board.progress.done = board.listaComercialDone.points;
-				board.progress.total = board.listaComercial.points + board.listaComercialDone.points;
+				board.progress.toDo = board.listaComercial ? board.listaComercial.points : 0;
+				board.progress.done = board.listaComercialDone ? board.listaComercialDone.points : 0;
+				board.progress.total = board.progress.done + board.progress.toDo;
 				
-				board.progress.index = board.progress.total ? board.progress.toDo / board.progress.total : 0;
+				board.progress.index = board.progress.total ? board.progress.done / board.progress.total : 0;
 			}
 
 			board.setProjectDetails = function() {
@@ -73,15 +73,19 @@ angular.module( 'trelloUtilities.trelloModel', [
 			board.setLists = function(lists) {
 				board.lists = {};
 	            lists.forEach(function(list){
-		            board.lists[list.id] = List(list);
-		            if(list.name == "Lista Comercial") {
-		            	board.listaComercial = list;
-		            	board.listaComercialId = list.id;
-		            }
-		            if(list.name == "Lista Comercial Done") {
-		            	board.listaComercialDoneId = list.id;
-		            	board.listaComercialDone = list;
-		            }
+	            	console.log(list);
+	            	if(!list.closed) {
+	            		board.lists[list.id] = List(list);
+			            if(list.name == "Lista Comercial") {
+			            	board.listaComercial = list;
+			            	board.listaComercialId = list.id;
+			            }
+			            if(list.name == "Lista Comercial Done") {
+			            	board.listaComercialDoneId = list.id;
+			            	board.listaComercialDone = list;
+			            }
+	            	}
+		            
 		        });
 			}
 
@@ -96,20 +100,25 @@ angular.module( 'trelloUtilities.trelloModel', [
 				board._cardsUrlsWithParent = [];
 				board.cards = [];
                 cards.forEach(function(card){
-                  board.cards.push(Card(card));
-                  card.idChecklists.forEach(function(id){
-                    var checklist = board.checklists[id];
-                    if(checklist.name == "Children"){
-                      console.log(card.name, " tiene hijos");
-                      checklist.checkItems.forEach(function(hijo){
-                        board._cardsUrlsWithParent.push(hijo.name);
-                      });
-                    }
-                  });
+                	if(board.lists[card.idList]) {
+                		board.cards.push(Card(card));
+		                card.idChecklists.forEach(function(id){
+			                var checklist = board.checklists[id];
+			                if(checklist.name == "Children"){
+			                	console.log(card.name, " tiene hijos");
+			                    checklist.checkItems.forEach(function(hijo){
+			                    	board._cardsUrlsWithParent.push(hijo.name);
+			                    });
+			                }
+		              	});
+                	}
+	                
                 });
 
-                board.listaComercial.populateFromCards(board.cards);
-                board.listaComercialDone.populateFromCards(board.cards);
+                if(board.listaComercial)
+                	board.listaComercial.populateFromCards(board.cards);
+                if(board.listaComercialDone)
+                	board.listaComercialDone.populateFromCards(board.cards);
                 board.setProgress();
 			}
 

@@ -34,7 +34,6 @@ angular.module( 'trelloUtilities.projects', [
   };
 
   var getAllBoardsData = function (){
-    console.log(TrelloModel.organizations);
     $scope.organizations = TrelloModel.organizations;
     TrelloModel.getAllBoardsData(doneOrganization,doneGettingData);
   }
@@ -44,22 +43,20 @@ angular.module( 'trelloUtilities.projects', [
           return;
 
     $scope.searching = true;
-    TrelloModel.setMember($scope.member);
+    TrelloModel.setMember($rootScope.member);
     TrelloModel.getBoards(getAllBoardsData);
   }
 
   $scope.setCurrentBoard = function(board) {
-    console.log(board);
     $scope.currentBoard = board;
   }
 
   $rootScope.$on("memberLoaded", function (args) {
-    console.log("memberLoaded");
     $scope.getBoards();
   });
 
   $scope.init = function() {
-    if($scope.member){
+    if($rootScope.member){
       $scope.getBoards();
     }
   }

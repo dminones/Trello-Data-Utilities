@@ -23,28 +23,42 @@ angular.module('trelloUtilities', [
   TrelloClientProvider.init({
     key: '5443c286e5a91dca5a9b6541eb0c71f2',
     appName: 'Trello Utilities App',
-    tokenExpiration: 'never',
+    tokenExpiration: '1hour',
     scope: ['read', 'write', 'account'],
+    returnUrl: window.location
   });
 })
 
 .controller( 'AppCtrl', function AppCtrl ( $rootScope, $scope, $location, TrelloClient,  $state ) {
   $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-    console.log("entro aca");
     if ( angular.isDefined( toState.data.pageTitle ) ) {
       $scope.pageTitle = toState.data.pageTitle ;
     }
   });  
 
-  $scope.authenticate = TrelloClient.authenticate;
+  $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState) {
+    if (!$rootScope.member && (toState.name != 'login')) {
+      event.preventDefault();
+      $state.go('login',{});
+    }
+  });
 
-  $scope.init = function(){
+  $rootScope.getMember = function(callback) {
     TrelloClient.get('/members/me').then(function(result){
-      $scope.member = result.data;
       $rootScope.$broadcast("memberLoaded");
+      $rootScope.member = result.data;
+      callback($rootScope.member);
     }).catch(function(error){
       console.log(error);
-      $state.go('login');
+      callback(null);
+    });
+  };
+
+  $scope.init = function(){
+    $rootScope.getMember(function(member) {
+      if(!member) {
+        $state.go('login',{});
+      }
     });
   };
   $scope.init();
