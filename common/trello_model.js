@@ -14,7 +14,6 @@ angular.module( 'trelloUtilities.trelloModel', [
 		function List (list)  {
 
 			list.populateFromCards = function(cards) {
-				console.log("cards ",cards);
 				list.points = 0;
 				cards.forEach(function(card){
 					if(card.idList == list.id) {
@@ -96,6 +95,13 @@ angular.module( 'trelloUtilities.trelloModel', [
           		});
 			}
 
+			board.setLabels = function(labels) {
+				board.labels = {};
+          		labels.forEach(function(label){
+            		board.labels[label.name] = label;
+          		});
+			}
+
 			board.setCards = function(cards) {
 				board._cardsUrlsWithParent = [];
 				board.cards = [];
@@ -105,16 +111,14 @@ angular.module( 'trelloUtilities.trelloModel', [
 		                card.idChecklists.forEach(function(id){
 			                var checklist = board.checklists[id];
 			                if(checklist.name == "Children"){
-			                	console.log(card.name, " tiene hijos");
-			                    checklist.checkItems.forEach(function(hijo){
-			                    	board._cardsUrlsWithParent.push(hijo.name);
+			                	checklist.checkItems.forEach(function(hijo){
+			                    	board._cardsUrlsWithParent.push(hijo.name.slice(0,hijo.name.lastIndexOf("/")));
 			                    });
 			                }
 		              	});
                 	}
 	                
                 });
-
                 if(board.listaComercial)
                 	board.listaComercial.populateFromCards(board.cards);
                 if(board.listaComercialDone)
@@ -122,13 +126,18 @@ angular.module( 'trelloUtilities.trelloModel', [
                 board.setProgress();
 			}
 
+			board.bugLabel = function(){
+				return ( board.labels && board.labels["bug"]) ? board.labels["bug"].id : null;
+			}
+
 			board.boardLoaded = function() {
 				board.cardsMissingParent = [];
 	            board.cards.forEach(function(card){
-		            if((board._cardsUrlsWithParent.indexOf(card.url) == -1) &&
+	            	if((board._cardsUrlsWithParent.indexOf(card.shortUrl) == -1) &&
 		            	card.idList != board.listaComercialId &&
-		                card.idList != board.listaComercialDoneId ){
-		                board.cardsMissingParent.push(card);
+		                card.idList != board.listaComercialDoneId &&
+		                (card.idLabels.indexOf(board.bugLabel()) <= -1)){
+							board.cardsMissingParent.push(card);
 		            }
 	           	});
 			}
@@ -220,6 +229,19 @@ angular.module( 'trelloUtilities.trelloModel', [
 		      	function(organization,key,callback){
 		        	async.forEachOfLimit(organization.boards, 5, function(board, index, callback) {
 		          	async.waterfall([
+		          		function(callback){
+			              async.retry({ times: 20, interval: 5000 }, function(retryCallback,results){
+			                TrelloClient.get('/boards/'+board.id+'/labels').then(function(result){
+			                  board.setLabels(result.data);
+			                  retryCallback(null,result.data);
+			                }).catch(function(error){
+			                  retryCallback(error);
+			                });
+			              }, function(err, result) {
+			                  if(err) console.error(err);
+			                  callback(err);
+			              });
+			            },
 			            function(callback){
 			              async.retry({ times: 20, interval: 5000 }, function(retryCallback,results){
 			                TrelloClient.get('/boards/'+board.id+'/lists').then(function(result){
