@@ -8,7 +8,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 	function(){
 		var regEstimate = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m;//parse regexp- accepts digits, decimals and '?', surrounded by ()
 	    var regId = /((?:^|\s?))\[(\x3f|\d*\.?\d+)(\])\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
-    	var regClient = /((?:^|\s?))\{(\x3f|\w*\.?\w+)(\})\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
+    	var regClient = /((?:^|\s?))\{(\x3f|\w?\ ?\w?)(\})\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
 
 
 		function List (list)  {
@@ -142,7 +142,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 	           	});
 			}
 
-			
+			console.log(board);
     		return board.setProjectDetails();
 		}
 

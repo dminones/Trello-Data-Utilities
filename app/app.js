@@ -16,7 +16,7 @@ angular.module('trelloUtilities', [
 }])
 
 .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
-  $urlRouterProvider.otherwise( '/projects' );
+  $urlRouterProvider.otherwise( '/about' );
 })
 
 .config(function(TrelloClientProvider){
@@ -39,7 +39,7 @@ angular.module('trelloUtilities', [
   $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState) {
     if (!$rootScope.member && (toState.name != 'login')) {
       event.preventDefault();
-      $state.go('login',{});
+      $state.go('login',{returnUrl: toState.name});
     }
   });
 
@@ -57,7 +57,7 @@ angular.module('trelloUtilities', [
   $scope.init = function(){
     $rootScope.getMember(function(member) {
       if(!member) {
-        $state.go('login',{});
+¡        $state.go('login',{returnUrl: "/login"});
       }
     });
   };
