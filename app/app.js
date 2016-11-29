@@ -7,6 +7,7 @@ angular.module('trelloUtilities', [
   'ng',
   'trello-api-client',
   'satellizer',
+  'tooltipDirective'
 ])
 
 .filter('percentage', ['$filter', function ($filter) {

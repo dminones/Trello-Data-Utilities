@@ -56,7 +56,6 @@ angular.module( 'trelloUtilities.trelloModel', [
 				}
 				var parsedId = board.projectName.match(regId);
 				if(parsedId) {
-					console.log("id ",parsedId);
 					board.projectId= parsedId[2];
 					board.projectName = board.projectName.replace(parsedId[0],"");
 				}
@@ -104,6 +103,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 
 			board.setCards = function(cards) {
 				board._cardsUrlsWithParent = [];
+				board._cardsWithChildrens = [];
 				board.cards = [];
                 cards.forEach(function(card){
                 	if(board.lists[card.idList]) {
@@ -111,6 +111,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 		                card.idChecklists.forEach(function(id){
 			                var checklist = board.checklists[id];
 			                if(checklist.name == "Children"){
+			                	board._cardsWithChildrens.push(card.id);
 			                	checklist.checkItems.forEach(function(hijo){
 			                    	board._cardsUrlsWithParent.push(hijo.name.slice(0,hijo.name.lastIndexOf("/")));
 			                    });
@@ -132,6 +133,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 
 			board.boardLoaded = function() {
 				board.cardsMissingParent = [];
+				board.cardsMissingChildren = [];
 	            board.cards.forEach(function(card){
 	            	if((board._cardsUrlsWithParent.indexOf(card.shortUrl) == -1) &&
 		            	card.idList != board.listaComercialId &&
@@ -139,11 +141,17 @@ angular.module( 'trelloUtilities.trelloModel', [
 		                (card.idLabels.indexOf(board.bugLabel()) <= -1)){
 							board.cardsMissingParent.push(card);
 		            }
+
+		            if( (card.idList == board.listaComercialId || 
+		            	card.idList == board.listaComercialDoneId ) &&
+		            	board._cardsWithChildrens.indexOf(card.id) == -1)
+		                {
+		            	board.cardsMissingChildren.push(card);
+		            }
 	           	});
 			}
 
-			console.log(board);
-    		return board.setProjectDetails();
+			return board.setProjectDetails();
 		}
 
 		function Organization (){
