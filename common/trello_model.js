@@ -8,7 +8,7 @@ angular.module( 'trelloUtilities.trelloModel', [
 	function(){
 		var regEstimate = /((?:^|\s?))\((\x3f|\d*\.?\d+)(\))\s?/m;//parse regexp- accepts digits, decimals and '?', surrounded by ()
 	    var regId = /((?:^|\s?))\[(\x3f|\d*\.?\d+)(\])\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
-    	var regClient = /((?:^|\s?))\{(\x3f|\w?\ ?\w?)(\})\s?/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
+    	var regClient = /(\{)(.*?)(\})/m; //parse regexp- accepts digits, decimals and '?', surrounded by []
 
 
 		function List (list)  {
@@ -48,20 +48,24 @@ angular.module( 'trelloUtilities.trelloModel', [
 			}
 
 			board.setProjectDetails = function() {
-				
+				console.log("hola");
 				board.projectName = board.name;
 				var parsed = board.name.match(regEstimate);
 				if(parsed) {
+					console.log("estimate ",parsed);
 					board.points= parseInt(parsed[2]);
 					board.projectName = board.projectName.replace(parsed[0],"");
 				}
 				var parsedId = board.projectName.match(regId);
 				if(parsedId) {
-					board.projectId= parseInt(parsedId[2]);
+					console.log("id ",parsedId);
+					board.projectId= parsedId[2];
 					board.projectName = board.projectName.replace(parsedId[0],"");
 				}
+				console.log("proyeto", board.projectName);
 				var parsedClient = board.projectName.match(regClient);
 				if(parsedClient) {
+					console.log("cliente ",parsedClient);
 					board.client= parsedClient[2];
 					board.projectName = board.projectName.replace(parsedClient[0],"");
 				}

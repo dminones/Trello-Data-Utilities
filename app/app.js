@@ -57,7 +57,7 @@ angular.module('trelloUtilities', [
   $scope.init = function(){
     $rootScope.getMember(function(member) {
       if(!member) {
-¡        $state.go('login',{returnUrl: "/login"});
+        $state.go('login',{returnUrl: "/login"});
       }
     });
   };

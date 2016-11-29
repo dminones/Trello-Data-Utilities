@@ -17,7 +17,7 @@ angular.module( 'trelloUtilities.projects', [
   });
 })
 
-.controller( 'ProjectsCtrl', function ProjectsCtrl( $rootScope, $scope, TrelloModel){
+.controller( 'ProjectsCtrl', function ProjectsCtrl( $rootScope, $scope, TrelloModel, $state){
   $scope.popupOptions = {
     type: 'popup'
   }

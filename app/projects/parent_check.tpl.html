@@ -7,7 +7,13 @@
         <thead>
             <tr>
                 <td>
-                    Board
+                    Id
+                </td>
+                <td>
+                    Client
+                </td>
+                <td>
+                    Project
                 </td>
                 <td>
                     Tarjetas sin padre
@@ -17,7 +23,9 @@
         </thead>
         <tbody>
           <tr ng-repeat="board in organization.boards" ng-show="!board.closed">
-            <td><a href="{{ board.url }}" target="_blank">{{ board.name }}</a></td>
+            <td>{{ board.projectId }}</td>
+            <td>{{ board.client }}</td>
+            <td>{{ board.projectName }} <a href="{{ board.url }}" target="_blank"><i role="button" class="glyphicon glyphicon-link" ></i></a></td>
             <td><a style="cursor: pointer;" data-toggle="modal" data-target="#myModal" ng-click="setCurrentBoard(board)"v >{{ board.cardsMissingParent.length }}</a></td>
           </tr>
         </tbody>
