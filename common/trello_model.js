@@ -48,11 +48,9 @@ angular.module( 'trelloUtilities.trelloModel', [
 			}
 
 			board.setProjectDetails = function() {
-				console.log("hola");
 				board.projectName = board.name;
 				var parsed = board.name.match(regEstimate);
 				if(parsed) {
-					console.log("estimate ",parsed);
 					board.points= parseInt(parsed[2]);
 					board.projectName = board.projectName.replace(parsed[0],"");
 				}
@@ -62,10 +60,8 @@ angular.module( 'trelloUtilities.trelloModel', [
 					board.projectId= parsedId[2];
 					board.projectName = board.projectName.replace(parsedId[0],"");
 				}
-				console.log("proyeto", board.projectName);
 				var parsedClient = board.projectName.match(regClient);
 				if(parsedClient) {
-					console.log("cliente ",parsedClient);
 					board.client= parsedClient[2];
 					board.projectName = board.projectName.replace(parsedClient[0],"");
 				}
