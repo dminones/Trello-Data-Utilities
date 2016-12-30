@@ -12,7 +12,7 @@ angular.module( 'trelloUtilities.about', [
         templateUrl: 'app/about/about.tpl.html'
       }
     },
-    data:{ pageTitle: 'What is It?' }
+    data:{ pageTitle: 'Acerca de la aplicación' }
   });
 })
 

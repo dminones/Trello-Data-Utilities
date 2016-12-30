@@ -17,7 +17,7 @@ angular.module('trelloUtilities', [
 }])
 
 .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
-  $urlRouterProvider.otherwise( '/about' );
+  $urlRouterProvider.otherwise( '/projects' );
 })
 
 .config(function(TrelloClientProvider){

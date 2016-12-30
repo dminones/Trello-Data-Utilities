@@ -21,9 +21,12 @@ angular.module( 'trelloUtilities.projects', [
   $scope.popupOptions = {
     type: 'popup'
   }
-
+  $scope.filter = {};
   $scope.organizations = {};
   $scope.searching = false;
+
+  $scope.propertyName = 'projectId';
+  $scope.reverse = false;
 
   var doneOrganization = function(organization) {
     organization.done = true;
@@ -59,7 +62,13 @@ angular.module( 'trelloUtilities.projects', [
     if($rootScope.member){
       $scope.getBoards();
     }
-  }
+  };
+
+  $scope.sortBy = function(propertyName) {
+    $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
+    $scope.propertyName = propertyName;
+  };
+
   $scope.init();
 })
 
