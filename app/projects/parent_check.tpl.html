@@ -6,32 +6,44 @@
     <table class="table table-bordered table-striped" ng-show="organization.done">
         <thead>
             <tr>
-                <td>
-                    Id
-                </td>
-                <td>
-                    Client
-                </td>
-                <td>
-                    Project
-                </td>
-                <td>
-                    Diff 
-                    <a title="Differencia entre los puntos estimados y el total de las listas comerciales. Signo positivo significa que faltan tarjetas" data-toggle="tooltip" data-placement="top" tooltip><i role="button" class="glyphicon glyphicon-question-sign"></i></a>
+            <td>
+                  <span ng-click="sortBy('projectId')" role="button">Id</span>
+                  <span class="glyphicon" ng-show="propertyName === 'projectId'" ng-class="{'glyphicon-chevron-down': reverse, 'glyphicon-chevron-up': !reverse }"></span>
+              </td>
+              <td>
+                  <span ng-click="sortBy('client')" role="button">Client</span>
+                  <span class="glyphicon" ng-show="propertyName === 'client'" ng-class="{'glyphicon-chevron-down': reverse, 'glyphicon-chevron-up': !reverse }"></span>
+              </td>
+               <td>
+                  <span ng-click="sortBy('projectName')" role="button">Project</span>
+                  <span class="glyphicon" ng-show="propertyName === 'projectName'" ng-class="{'glyphicon-chevron-down': reverse, 'glyphicon-chevron-up': !reverse }"></span>
+              </td>
+               <td>
+                  <span ng-click="sortBy('points')" role="button">Diff</span>
+                  <a title="Differencia entre los puntos estimados y el total de las listas comerciales. Signo positivo significa que faltan tarjetas" data-toggle="tooltip" data-placement="top" tooltip><i role="button" class="glyphicon glyphicon-question-sign"></i></a>
 
-                </td>
-                <td>
-                    Tarjetas sin padre
-                </td>
-                 <td>
-                    Tarjetas sin hijos
-                </td>
-                
+                  <span class="glyphicon" ng-show="propertyName === 'points'" ng-class="{'glyphicon-chevron-down': reverse, 'glyphicon-chevron-up': !reverse }"></span>
+              </td>
+              <td>
+                  Tarjetas sin padre
+              </td>
+              <td>
+                  Tarjetas sin hijos
+              </td>
+             
             </tr>
             
         </thead>
         <tbody>
-          <tr ng-repeat="board in organization.boards" ng-show="!board.closed">
+          <tr>
+                <td><input ng-keyup="onKeyup($event)" class="form-control ng-pristine ng-untouched ng-valid ng-scope"type="text" ng-model="filter.projectId" /></td>
+                <td><input ng-keyup="onKeyup($event)" class="form-control ng-pristine ng-untouched ng-valid ng-scope" type="text" ng-model="filter.client" /></td>
+                <td><input ng-keyup="onKeyup($event)" class="form-control ng-pristine ng-untouched ng-valid ng-scope" type="text" ng-model="filter.projectName" /></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+          <tr ng-repeat="board in organization.boards | filter:filter | orderBy:propertyName:reverse" ng-show="!board.closed">
             <td>{{ board.projectId }}</td>
             <td>{{ board.client }}</td>
             <td>{{ board.projectName }} <a href="{{ board.url }}" target="_blank"><i class="glyphicon glyphicon-link" ></i></a></td>

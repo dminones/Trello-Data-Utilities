@@ -19,6 +19,10 @@ angular.module( 'trelloUtilities.parentCheck', [
 
 .controller( 'ParentCheckCtrl', function ParentCheckCtrl( $rootScope, $scope, TrelloModel){
 
+  $scope.filter = {};
+  $scope.propertyName = 'projectId';
+  $scope.reverse = false;
+
   $scope.popupOptions = {
     type: 'popup'
   }
@@ -58,6 +62,12 @@ angular.module( 'trelloUtilities.parentCheck', [
       $scope.getBoards();
     }
   }
+  
+  $scope.sortBy = function(propertyName) {
+    $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
+    $scope.propertyName = propertyName;
+  };
+
   $scope.init();
 
 })
