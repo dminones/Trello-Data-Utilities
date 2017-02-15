@@ -7,8 +7,12 @@ Es una aplicación angular que obtiene datos de los boards de trello del usuario
 Getting Started
 --
 
+Instalar dependencias
 
+`bower install`
+
+Las dependencias están incluidas en el archivo index.html
 
 Proyectos
 --
-En esta pantalla toma todos los boards
+En esta pantalla toma todos las organizaciones que contengan el string "Projects" y para cada board la incluye en la pantalla.
